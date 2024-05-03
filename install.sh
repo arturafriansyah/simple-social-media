@@ -2,7 +2,7 @@
 
 npm install
 npm run dev
-composer install
+sudo composer install
 cp .env.example .env
 php artisan key:generate
 
