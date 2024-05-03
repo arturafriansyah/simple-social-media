@@ -5,7 +5,7 @@ on:
     branches:
       - main
 env:
-  IMAGE_NAME: "username_docker/username_adinusa-simple-social-media"
+  IMAGE_NAME: "afrisyah/afriansyah-simple-social-media"
 jobs:
   run-mysql-in-docker:
     runs-on: self-hosted
