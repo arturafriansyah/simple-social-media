@@ -32,7 +32,7 @@ COPY composer.json composer.lock ./
 RUN composer config --global allow-plugins true
 
 # Instal dependensi aplikasi
-RUN composer install --no-scripts --no-autoloader
+RUN composer install --no-scripts
 
 # Salin seluruh kode aplikasi ke direktori kerja
 COPY . .
