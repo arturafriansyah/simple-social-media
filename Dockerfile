@@ -43,7 +43,7 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
     chown -R www-data:www-data bootstrap/cache storage
 
 # Generate autoload files dan cache
-RUN composer dump-autoload
+# RUN composer dump-autoload
 RUN php artisan config:cache
 
 # Setel izin untuk direktori storage dan bootstrap/cache
