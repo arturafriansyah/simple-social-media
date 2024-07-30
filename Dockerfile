@@ -43,12 +43,16 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
     chown -R www-data:www-data bootstrap/cache storage
 
 # Generate autoload files dan cache
-#RUN composer dump-autoload
-#RUN php artisan config:cache
+RUN composer dump-autoload
+RUN php artisan config:cache
 
 # Setel izin untuk direktori storage dan bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
+    chmod -R 775 bootstrap/cache storage && \
+    chown -R www-data:www-data bootstrap/cache storage
+RUN mkdir -p bootstrap/cache storage/framework/cache storage/framework/views storage/logs && \
+    chown -R www-data:www-data bootstrap storage && \
+    chmod -R 755 bootstrap storage 
 
 # Setel document root ke direktori public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
