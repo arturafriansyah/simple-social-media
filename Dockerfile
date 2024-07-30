@@ -44,7 +44,7 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
 
 # Generate autoload files dan cache
 # RUN composer dump-autoload
-RUN php artisan config:cache
+# RUN php artisan config:cache
 
 # Setel izin untuk direktori storage dan bootstrap/cache
 RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
