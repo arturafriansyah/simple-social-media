@@ -60,7 +60,8 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 
 # Tambahkan konfigurasi Apache
 COPY sosmed.conf /etc/apache2/sites-available/000-default.conf
-
+WORKDIR /var/www/sosmed
+RUN ./install.sh
 # Ekspose port 80 untuk Apache
 EXPOSE 80
 
