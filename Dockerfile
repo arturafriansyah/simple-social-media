@@ -43,8 +43,8 @@ RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
     chown -R www-data:www-data bootstrap/cache storage
 
 # Generate autoload files dan cache
-# RUN composer dump-autoload
-# RUN php artisan config:cache
+RUN composer dump-autoload
+RUN php artisan config:cache
 
 # Setel izin untuk direktori storage dan bootstrap/cache
 RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
@@ -55,8 +55,8 @@ RUN mkdir -p bootstrap/cache storage/framework/cache storage/framework/views sto
     chmod -R 755 bootstrap storage 
 
 # Setel document root ke direktori public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+#ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+#RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 
 # Tambahkan konfigurasi Apache
 COPY sosmed.conf /etc/apache2/sites-available/000-default.conf
