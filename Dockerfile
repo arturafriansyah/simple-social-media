@@ -1,69 +1,41 @@
-# Gunakan image resmi PHP dengan Apache sebagai base image
-FROM php:8.1-apache
+FROM ubuntu:22.04
 
-# Atur direktori kerja ke /var/www/html
-WORKDIR /var/www/html
-
-# Instal dependensi sistem yang diperlukan
-RUN apt-get update && apt-get install -y \
-    git \
-    zip \
-    unzip \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
+RUN apt update -y && \
+    DEBIAN_FRONTEND=noninteractive apt install -y apache2 \
+    php \
     npm \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    php-xml \
+    php-mbstring \
+    php-curl \
+    php-mysql \
+    php-gd \
+    unzip \
+    nano  \
+    curl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Instal ekstensi PHP yang diperlukan
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-# Aktifkan modul Apache yang diperlukan
-RUN a2enmod rewrite
+RUN mkdir -p /var/www/sosmed
+WORKDIR /var/www/sosmed
 
-# Instal Composer secara global
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+ADD . /var/www/sosmed
+ADD sosmed.conf /etc/apache2/sites-available/
 
-# Salin file composer.json dan composer.lock ke direktori kerja
-COPY composer.json composer.lock ./
+RUN a2dissite 000-default.conf && a2ensite sosmed.conf
 
-# Tambahkan konfigurasi allow-plugins untuk keamanan tambahan
-RUN composer config --global allow-plugins true
-
-# Instal dependensi aplikasi
-RUN composer install --no-scripts
-
-# Salin seluruh kode aplikasi ke direktori kerja
-COPY . .
-
-# Pastikan direktori cache Laravel ada dan writable
-RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
-    chmod -R 775 bootstrap/cache storage && \
-    chown -R www-data:www-data bootstrap/cache storage
-
-# Generate autoload files dan cache
-#RUN composer dump-autoload
-#RUN php artisan config:cache
-
-# Setel izin untuk direktori storage dan bootstrap/cache
-RUN mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} && \
-    chmod -R 775 bootstrap/cache storage && \
-    chown -R www-data:www-data bootstrap/cache storage
-RUN mkdir -p bootstrap/cache storage/framework/cache storage/framework/views storage/logs && \
+RUN mkdir -p bootstrap/cache \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views && \
     chown -R www-data:www-data bootstrap storage && \
-    chmod -R 755 bootstrap storage 
+    chmod -R ug+rwx bootstrap storage
 
-# Setel document root ke direktori public
-#ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-#RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN chmod +x install.sh && ./install.sh
 
-# Tambahkan konfigurasi Apache
-COPY sosmed.conf /etc/apache2/sites-available/000-default.conf
-RUN chmod +x install.sh
-RUN ./install.sh
-# Ekspose port 80 untuk Apache
-EXPOSE 80
+RUN chown -R www-data:www-data /var/www/sosmed && \
+    chmod -R 755 /var/www/sosmed
 
-# Jalankan perintah untuk memulai Apache
-CMD ["apache2-foreground"]
+EXPOSE 8000
+CMD php artisan serve --host=0.0.0.0 --port=8000
