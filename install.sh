@@ -1,17 +1,22 @@
 #!/bin/sh
 set -e
 
-# Install dependency composer
+npm config set registry https://registry.npmjs.org/
+npm config set fetch-retries 5
+npm config set fetch-retry-factor 2
+npm config set fetch-timeout 120000        # 120 detik
+npm config set fetch-retry-maxtimeout 300000  # 300 detik (5 menit)
+
+npm config delete proxy || true
+npm config delete https-proxy || true
+
 composer install --no-dev --optimize-autoloader
 
-# Install dependency Node.js
-npm install --legacy-peer-deps
+npm install --legacy-peer-deps --no-audit --progress=false
 
-# Build asset Laravel Mix untuk production
 npm run dev
 
-# Setup file environment
-cp .env.example .env
+cp .env.example .env || true
 
 php artisan key:generate
 
@@ -19,5 +24,5 @@ php artisan key:generate
 sed -i 's/DB_HOST=127.0.0.1/DB_HOST=172.17.0.1/g' .env
 sed -i 's/DB_PASSWORD=/DB_PASSWORD=password/g' .env
 
-php artisan migrate
-php artisan db:seed
+php artisan migrate --force
+php artisan db:seed --force
